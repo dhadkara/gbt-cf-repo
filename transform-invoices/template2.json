@@ -106,20 +106,23 @@
             "SourceAccount": {
                "Ref": "AWS::AccountId"
             },
-            "SourceArn": {
-               "Fn::If": [
-                  "CreateMockResources",
-                  {
-                     "Fn::GetAtt": [
-                        "S3BucketMock",
-                        "Arn"
-                     ]
-                  },
-                  {
-                     "Fn::ImportValue": "sftp-bucket-cert-bronze-arn"
-                  }
-               ]
-            }
+            "SourceArn": 
+               {
+                  "Fn::If": [
+                     "CreateMockResources",
+                     {
+                        "Fn::GetAtt": [
+                           "S3BucketMock",
+                           "Arn"
+                        ]
+                     },
+                     {
+                         "Fn::ImportValue" : "sftp-bucket-cert-bronze-arn"
+                     }
+                    
+                  ]
+               }
+            
          }
       },
       "LambdaTrigger": {
@@ -139,10 +142,24 @@
                ]
             },
             "Bucket": {
-               "Ref": "S3BucketMock"
+               "Fn::If": [
+                  "CreateMockResources",
+                  {
+                     "Ref": 
+                        "S3BucketMock"
+                     
+                  },
+                  {
+                      "Fn::ImportValue" : "sftp-bucket-cert-bronze"
+                  }
+                 
+               ]
+
             }
+
          }
       },
+
       "S3BucketMock": {
          "Type": "AWS::S3::Bucket",
          "Condition": "CreateMockResources",

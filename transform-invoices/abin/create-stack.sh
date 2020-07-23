@@ -1,7 +1,7 @@
 #!/bin/bash
 
 aws cloudformation create-stack \
-  --stack-name test-lambda-dev \
+  --stack-name transform-invoices-dev \
   --template-body file://template1.json \
   --parameters file://parameters.json
 
