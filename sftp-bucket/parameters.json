@@ -1,0 +1,10 @@
+[
+    {
+      "ParameterKey": "ServiceName",
+      "ParameterValue": "sftp-bucket"
+    }, 
+    {
+      "ParameterKey": "AWSEnvironment",
+      "ParameterValue": "cert"
+    }
+  ]

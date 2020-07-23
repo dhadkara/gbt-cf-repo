@@ -1,0 +1,129 @@
+{
+   "AWSTemplateFormatVersion": "2010-09-09",
+   "Parameters": {
+      "ServiceName": {
+         "Description": "MicroServiceName",
+         "Type": "String",
+         "Default": "invoicefiletransformerservice"
+      },
+      "AWSEnvironment": {
+         "Description": "AWS Environment Name",
+         "Type": "String"
+      },
+      "LambdaRole": {
+         "Description": "AWS Lambda Role",
+         "Type": "String"
+      }
+   },
+   "Conditions": {
+      "CreateMockResources": {
+         "Fn::Or": [
+            {
+               "Fn::Equals": [
+                  {
+                     "Ref": "AWSEnvironment"
+                  },
+                  "aat"
+               ]
+            },
+            {
+               "Fn::Equals": [
+                  {
+                     "Ref": "AWSEnvironment"
+                  },
+                  "perf"
+               ]
+            }
+         ]
+      }
+   },
+   "Resources": {
+      "HelloLambda": {
+         "Type": "AWS::Lambda::Function",
+         "Properties": {
+            "FunctionName": "HelloLambda",
+            "Handler": "src/index.handler",
+            "Role": {
+               "Fn::Join": [
+                  "",
+                  [
+                     "arn:aws:iam::",
+                     {
+                        "Ref": "AWS::AccountId"
+                     },
+                     ":role/",
+                     {
+                        "Ref": "LambdaRole"
+                     }
+                  ]
+               ]
+            },
+            "Code": {
+               "S3Bucket": "gbt-deployment-bucket-dev",
+               "S3Key": "HelloLambda"
+            },
+            "Runtime": "nodejs12.x",
+            "Timeout": 300
+         }
+      },
+      "S3BucketMock": {
+         "Type": "AWS::S3::Bucket",
+         "Condition": "CreateMockResources",
+         "Properties": {
+            "BucketName": {
+               "Fn::Join": [
+                  "-",
+                  [
+                     {
+                        "Ref": "ServiceName"
+                     },
+                     {
+                        "Ref": "AWSEnvironment"
+                     },
+                     "bronze-mock"
+                  ]
+               ]
+            },
+            "LifecycleConfiguration": {
+               "Rules": [
+                  {
+                     "Id": "DeleteContentAfter30Days",
+                     "Status": "Enabled",
+                     "ExpirationInDays": 30
+                  }
+               ]
+            }
+         },
+         "DeletionPolicy": "Delete"
+      },
+      "S3BucketSilver": {
+         "Type": "AWS::S3::Bucket",
+         "Properties": {
+            "BucketName": {
+               "Fn::Join": [
+                  "-",
+                  [
+                     {
+                        "Ref": "ServiceName"
+                     },
+                     {
+                        "Ref": "AWSEnvironment"
+                     },
+                     "silver"
+                  ]
+               ]
+            },
+            "LifecycleConfiguration": {
+               "Rules": [
+                  {
+                     "Id": "DeleteContentAfter30Days",
+                     "Status": "Enabled",
+                     "ExpirationInDays": 30
+                  }
+               ]
+            }
+         },
+         "DeletionPolicy": "Delete"
+      }
+   }
+}

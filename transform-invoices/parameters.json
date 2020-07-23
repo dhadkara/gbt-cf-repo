@@ -1,0 +1,14 @@
+[
+    {
+      "ParameterKey": "ServiceName",
+      "ParameterValue": "transform-invoices"
+    }, 
+    {
+      "ParameterKey": "AWSEnvironment",
+      "ParameterValue": "cert"
+    },
+    {
+      "ParameterKey": "LambdaRole",
+      "ParameterValue": "gbt-lambda-basic-role"
+    }
+  ]

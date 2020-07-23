@@ -1,0 +1,69 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "CF Template for Transform Individual Invoices",
+    "Parameters": {
+       "ServiceName": {
+          "Description": "MicroServiceName",
+          "Type": "String",
+          "Default": "sftp-bucket"
+       },
+       "AWSEnvironment": {
+          "Description": "AWS Environment Name",
+          "Type": "String"
+       }
+    },
+    "Resources": {
+        "S3Bucket": {
+           "Type": "AWS::S3::Bucket",
+           "Properties": {
+              "BucketName": {
+                 "Fn::Join": [
+                    "-",
+                    [
+                       {
+                          "Ref": "ServiceName"
+                       },
+                       
+                          "bronze",
+                       {
+                          "Ref": "AWSEnvironment"
+                       }
+                    ]
+                 ]
+              },
+              "LifecycleConfiguration": {
+                 "Rules": [
+                    {
+                       "Id": "DeleteContentAfter30Days",
+                       "Status": "Enabled",
+                       "ExpirationInDays": 30
+                    }
+                 ]
+              }
+           },
+           "DeletionPolicy": "Delete"
+        }
+    },
+    "Outputs": {
+      "S3Bucket": {
+         "Description": "Storage location for Invoice file to be processed by Lambda function",
+         "Value" : { "Ref" : "S3Bucket"},
+         "Export" : {
+          "Name" : {
+             "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "bronze" ] ]
+           }
+        }
+      },  
+      "S3BucketArn": {
+           "Description": "Storage location for Invoice file to be processed by Lambda function Arn",
+           "Value" : { "Fn::GetAtt" : [ "S3Bucket", "Arn" ]},
+           "Export" : {
+            "Name" : {
+               "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "bronze-arn" ] ]
+             }
+          }
+        }
+     }
+    
+}
