@@ -159,7 +159,24 @@
             },
             "Protocol": "lambda",
             "TopicArn": {
-               "Ref": "BronzeTopicMock"
+             
+               "Fn::Join": [
+                  "",
+                  [
+                     "arn:aws:sns:",
+                     {
+                        "Ref": "AWS::Region"
+                     },
+                     ":",
+                     {
+                        "Ref": "AWS::AccountId"
+                     },
+                     ":invoice-bucket-trigger-",
+                     {
+                        "Ref": "AWSEnvironment"
+                     }
+                  ]
+               ]
             }
          }
       },
@@ -169,7 +186,23 @@
             "Action": "lambda:InvokeFunction",
             "Principal": "sns.amazonaws.com",
             "SourceArn": {
-              "Ref": "BronzeTopicMock"
+               "Fn::Join": [
+                  "",
+                  [
+                     "arn:aws:sns:",
+                     {
+                        "Ref": "AWS::Region"
+                     },
+                     ":",
+                     {
+                        "Ref": "AWS::AccountId"
+                     },
+                     ":invoice-bucket-trigger-",
+                     {
+                        "Ref": "AWSEnvironment"
+                     }
+                  ]
+               ]
             },
             "FunctionName": {
                "Fn::GetAtt": [
