@@ -32,6 +32,14 @@
                     ]
                  ]
               },
+              "NotificationConfiguration":{
+               "TopicConfigurations": [
+                  {
+                     "Event" : "s3:ObjectCreated:*",
+                     "Topic" : {"Ref": "BronzeBucketTopic" }
+                   }
+               ]
+            },
               "LifecycleConfiguration": {
                  "Rules": [
                     {
@@ -45,22 +53,55 @@
            "DeletionPolicy": "Delete"
         }
     },
+    "BronzeBucketTopic" : {
+      "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+         "TopicName" : {"Fn::Join": [
+            "-",
+            [  
+                  "invoice-bucket-trigger",
+               {
+                  "Ref": "AWSEnvironment"
+               }
+            ]
+         ]}
+      }
+   },
+   "BronzeTopicPolicy": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+         "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+               {
+                  "Sid": "AllowBucketToPushNotificationEffect",
+                  "Effect": "Allow",
+                  "Principal": {
+                     "Service": "s3.amazonaws.com"
+                  },
+                  "Action": "sns:Publish",
+                  "Resource": "*"
+               }
+            ]
+         },
+         "Topics": [
+            {
+               "Ref": "BronzeBucketTopic"
+            }
+         ]
+      }
+   },
     "Outputs": {
       "S3Bucket": {
          "Description": "Storage location for Invoice file to be processed by Lambda function",
-         "Value" : { "Ref" : "S3Bucket"},
-         "Export" : {
-          "Name" : {
-             "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "bronze" ] ]
-           }
-        }
+         "Value" : { "Ref" : "S3Bucket"}
       },  
-      "S3BucketArn": {
-           "Description": "Storage location for Invoice file to be processed by Lambda function Arn",
-           "Value" : { "Fn::GetAtt" : [ "S3Bucket", "Arn" ]},
+      "TopicBucketArn": {
+           "Description": "SNS Topic for Invoice file to be processed by Lambda function Arn",
+           "Value" : { "Fn::GetAtt" : [ "BronzeBucketTopic", "Arn" ]},
            "Export" : {
             "Name" : {
-               "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "bronze-arn" ] ]
+               "Fn::Join" : [ "-", [ { "Ref" : "AWS::StackName" }, "topic-arn" ] ]
              }
           }
         }
