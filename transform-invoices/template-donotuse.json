@@ -68,7 +68,7 @@
       "CustomResourceLambdaFunction": {
          "Type": "AWS::Lambda::Function",
          "Properties": {
-            "Handler": "src/custom.handler",
+            "Handler": "src/custom.lambda_handler",
             "Role": {
                "Fn::Join": [
                   "",
@@ -88,8 +88,8 @@
                "S3Bucket": "gbt-deployment-bucket-dev",
                "S3Key": "HelloLambda"
             },
-            "Runtime": "nodejs12.x",
-            "Timeout": 300
+            "Runtime": "python3.6",
+            "Timeout": 50
          }
       },
       "LambdaInvokePermission": {
@@ -106,23 +106,20 @@
             "SourceAccount": {
                "Ref": "AWS::AccountId"
             },
-            "SourceArn": 
-               {
-                  "Fn::If": [
-                     "CreateMockResources",
-                     {
-                        "Fn::GetAtt": [
-                           "S3BucketMock",
-                           "Arn"
-                        ]
-                     },
-                     {
-                         "Fn::ImportValue" : "sftp-bucket-cert-bronze-arn"
-                     }
-                    
-                  ]
-               }
-            
+            "SourceArn": {
+               "Fn::If": [
+                  "CreateMockResources",
+                  {
+                     "Fn::GetAtt": [
+                        "S3BucketMock",
+                        "Arn"
+                     ]
+                  },
+                  {
+                     "Fn::ImportValue": "sftp-bucket-cert-bronze-arn"
+                  }
+               ]
+            }
          }
       },
       "LambdaTrigger": {
@@ -142,24 +139,10 @@
                ]
             },
             "Bucket": {
-               "Fn::If": [
-                  "CreateMockResources",
-                  {
-                     "Ref": 
-                        "S3BucketMock"
-                     
-                  },
-                  {
-                      "Fn::ImportValue" : "sftp-bucket-cert-bronze"
-                  }
-                 
-               ]
-
+               "Ref": "S3BucketMock"
             }
-
          }
       },
-
       "S3BucketMock": {
          "Type": "AWS::S3::Bucket",
          "Condition": "CreateMockResources",

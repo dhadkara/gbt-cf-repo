@@ -84,6 +84,16 @@
                   ]
                ]
             },
+            "NotificationConfiguration": {
+               "TopicConfigurations": [
+                  {
+                     "Event": "s3:ObjectCreated:*",
+                     "Topic": {
+                        "Ref": "BronzeTopicMock"
+                     }
+                  }
+               ]
+            },
             "LifecycleConfiguration": {
                "Rules": [
                   {
@@ -95,6 +105,79 @@
             }
          },
          "DeletionPolicy": "Delete"
+      },
+      "BronzeTopicMock": {
+         "Type": "AWS::SNS::Topic",
+         "Condition": "CreateMockResources",
+         "Properties": {
+            "TopicName": {
+               "Fn::Join": [
+                  "-",
+                  [
+                     "invoice-bucket-trigger",
+                     {
+                        "Ref": "AWSEnvironment"
+                     }
+                  ]
+               ]
+            }
+         }
+      },
+      "BronzeTopicPolicyMock": {
+         "Type": "AWS::SNS::TopicPolicy",
+         "Condition": "CreateMockResources",
+         "Properties": {
+            "PolicyDocument": {
+               "Version": "2012-10-17",
+               "Statement": [
+                  {
+                     "Sid": "AllowBucketToPushNotificationEffect",
+                     "Effect": "Allow",
+                     "Principal": {
+                        "Service": "s3.amazonaws.com"
+                     },
+                     "Action": "sns:Publish",
+                     "Resource": "*"
+                  }
+               ]
+            },
+            "Topics": [
+               {
+                  "Ref": "BronzeTopicMock"
+               }
+            ]
+         }
+      },
+      "BronzeTopicSubscription": {
+         "Type": "AWS::SNS::Subscription",
+         "Properties": {
+            "Endpoint": {
+               "Fn::GetAtt": [
+                  "HelloLambda",
+                  "Arn"
+               ]
+            },
+            "Protocol": "lambda",
+            "TopicArn": {
+               "Ref": "BronzeTopicMock"
+            }
+         }
+      },
+      "HelloLambdaFunctionPermission": {
+         "Type": "AWS::Lambda::Permission",
+         "Properties": {
+            "Action": "lambda:InvokeFunction",
+            "Principal": "sns.amazonaws.com",
+            "SourceArn": {
+              "Ref": "BronzeTopicMock"
+            },
+            "FunctionName": {
+               "Fn::GetAtt": [
+                  "HelloLambda",
+                  "Arn"
+               ]
+            }
+         }
       },
       "S3BucketSilver": {
          "Type": "AWS::S3::Bucket",
