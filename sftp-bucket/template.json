@@ -53,48 +53,47 @@
          },
          "DeletionPolicy": "Delete"
       },
-   
-   "BucketTopic": {
-      "Type": "AWS::SNS::Topic",
-      "Properties": {
-         "TopicName": {
-            "Fn::Join": [
-               "-",
-               [
-                  "invoice-bucket-trigger",
+      "BucketTopic": {
+         "Type": "AWS::SNS::Topic",
+         "Properties": {
+            "TopicName": {
+               "Fn::Join": [
+                  "-",
+                  [
+                     "invoice-bucket-trigger",
+                     {
+                        "Ref": "AWSEnvironment"
+                     }
+                  ]
+               ]
+            }
+         }
+      },
+      "BucketTopicPolicy": {
+         "Type": "AWS::SNS::TopicPolicy",
+         "Properties": {
+            "PolicyDocument": {
+               "Version": "2012-10-17",
+               "Statement": [
                   {
-                     "Ref": "AWSEnvironment"
+                     "Sid": "AllowBucketToPushNotificationEffect",
+                     "Effect": "Allow",
+                     "Principal": {
+                        "Service": "s3.amazonaws.com"
+                     },
+                     "Action": "sns:Publish",
+                     "Resource": "*"
                   }
                ]
+            },
+            "Topics": [
+               {
+                  "Ref": "BucketTopic"
+               }
             ]
          }
       }
    },
-   "BucketTopicPolicy": {
-      "Type": "AWS::SNS::TopicPolicy",
-      "Properties": {
-         "PolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-               {
-                  "Sid": "AllowBucketToPushNotificationEffect",
-                  "Effect": "Allow",
-                  "Principal": {
-                     "Service": "s3.amazonaws.com"
-                  },
-                  "Action": "sns:Publish",
-                  "Resource": "*"
-               }
-            ]
-         },
-         "Topics": [
-            {
-               "Ref": "BucketTopic"
-            }
-         ]
-      }
-   }
-},
    "Outputs": {
       "S3Bucket": {
          "Description": "Storage location for Invoice file to be processed by Lambda function",
@@ -102,6 +101,5 @@
             "Ref": "S3Bucket"
          }
       }
-     
    }
 }
