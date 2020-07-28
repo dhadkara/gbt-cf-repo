@@ -2,4 +2,4 @@
 
 zip -r package.zip ./src/*
 
-zip -r artifact.zip ./*
+zip -r artifact-.zip ./*

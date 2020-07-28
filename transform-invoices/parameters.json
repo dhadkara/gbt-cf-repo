@@ -5,7 +5,7 @@
     }, 
     {
       "ParameterKey": "AWSEnvironment",
-      "ParameterValue": "cert"
+      "ParameterValue": "perf"
     },
     {
       "ParameterKey": "LambdaRole",

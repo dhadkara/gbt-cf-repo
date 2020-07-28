@@ -1,0 +1,10 @@
+{
+    "TopicConfigurations": [
+        {
+            "TopicArn": "arn:aws:sns:us-east-1:181485138360:invoice-bucket-trigger-perf",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        }
+    ]
+}
