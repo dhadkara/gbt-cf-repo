@@ -1,0 +1,112 @@
+{
+   "AWSTemplateFormatVersion": "2010-09-09",
+   "Description": "CF Template for Transform Individual Invoices",
+   "Parameters": {
+      "ServiceName": {
+         "Description": "MicroServiceName",
+         "Type": "String",
+         "Default": "rds-aurora-example"
+      },
+      "AWSEnvironment": {
+         "Description": "AWS Environment Name",
+         "Type": "String"
+      },
+      "DBMasterUserName": {
+         "Description": "AWS Environment Name",
+         "Type": "String"
+      }
+   },
+   "Resources": {
+      "RDSCluster": {
+         "Type": "AWS::RDS::DBCluster",
+         "Properties": {
+            "DBClusterIdentifier": "gbt-cluster",
+            "MasterUsername": {
+               "Fn::Join": [
+                  "",
+                  [
+                     "{{resolve:secretsmanager:",
+                     {
+                        "Ref": "DBSecret"
+                     },
+                     ":SecretString:username}}"
+                  ]
+               ]
+            },
+            "MasterUserPassword": {
+               "Fn::Join": [
+                  "",
+                  [
+                     "{{resolve:secretsmanager:",
+                     {
+                        "Ref": "DBSecret"
+                     },
+                     ":SecretString:password}}"
+                  ]
+               ]
+            },
+            "DatabaseName": "gbtdatabase",
+            "Engine": "aurora",
+            "EngineMode": "serverless",
+            "EngineVersion": "5.6.10a",
+            "ScalingConfiguration": {
+               "AutoPause": true,
+               "MaxCapacity": 4,
+               "MinCapacity": 1,
+               "SecondsUntilAutoPause": 900
+            },
+            "DBSubnetGroupName": {
+               "Ref": "DBSubnetGroup"
+            }
+         }
+      },
+      "DBSecret": {
+         "Type": "AWS::SecretsManager::Secret",
+         "Properties": {
+            "Name": {
+               "Fn::Join": [
+                  "",
+                  [
+                     "AuroraUserSecret-",
+                     {
+                        "Ref": "AWSEnvironment"
+                     }
+                  ]
+               ]
+            },
+            "Description": "RDS database auto-generated user password",
+            "GenerateSecretString": {
+               "SecretStringTemplate": {
+                  "Fn::Join": [
+                     "",
+                     [
+                        "{\"username\": \"",
+                        {
+                           "Ref": "DBMasterUserName"
+                        },
+                        "\"}"
+                     ]
+                  ]
+               },
+               "GenerateStringKey": "password",
+               "PasswordLength": 30,
+               "ExcludeCharacters": "\"@/"
+            }
+         }
+      },
+      "DBSubnetGroup": {
+         "Type": "AWS::RDS::DBSubnetGroup",
+         "Properties": {
+            "DBSubnetGroupDescription": "description",
+            "SubnetIds": [
+               "subnet-b4ea80f9",
+               "subnet-ce4bd7c0",
+               "subnet-ea3f9ecb",
+               "subnet-bade04dc",
+               "subnet-204ee97f",
+               "subnet-9b51bfaa"
+            ]
+         }
+      }
+   }
+}

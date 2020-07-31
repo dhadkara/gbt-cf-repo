@@ -1,0 +1,14 @@
+[
+    {
+      "ParameterKey": "ServiceName",
+      "ParameterValue": "rds-aurora-example"
+    }, 
+    {
+      "ParameterKey": "AWSEnvironment",
+      "ParameterValue": "aat"
+    },
+    {
+      "ParameterKey": "DBMasterUserName",
+      "ParameterValue": "masteruser"
+    }
+  ]
