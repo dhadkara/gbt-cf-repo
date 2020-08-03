@@ -10,5 +10,9 @@
     {
       "ParameterKey": "LambdaRole",
       "ParameterValue": "gbt-lambda-basic-role"
+    },
+    {
+      "ParameterKey": "VersionKey",
+      "ParameterValue": "HelloLambda/v4"
     }
   ]

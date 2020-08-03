@@ -13,6 +13,10 @@
       "LambdaRole": {
          "Description": "AWS Lambda Role",
          "Type": "String"
+      },
+      "VersionKey": {
+         "Description": "AWS Lambda Role",
+         "Type": "String"
       }
    },
    "Conditions": {
@@ -60,7 +64,9 @@
             },
             "Code": {
                "S3Bucket": "gbt-deployment-bucket-anand",
-               "S3Key": "HelloLambda"
+               "S3Key": {
+                  "Ref": "VersionKey"
+               }
             },
             "Runtime": "nodejs12.x",
             "Timeout": 300
